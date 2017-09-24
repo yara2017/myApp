@@ -1,0 +1,20 @@
+﻿
+<canvas id="myCanvas" width="400" height="300"/>
+<script src="canvas.js"></script>
+<script type="text/javascript"> 　　
+    var canvas = document.getElementById("myCanvas"); 　　
+    var context = canvas.getContext("2d"); 　
+    context.fillStyle = "#FF0000"; 　
+    context.fillRect(50,50,150,100); 
+    context.moveTo(50, 50);
+    context.lineTo(150, 150);
+    context.stroke();
+//线条宽度
+context.lineWidth = 10;
+//线条颜色（支持颜色编码与rgb()函数）
+context.strokeStyle = "#cd2828";
+context.strokeStyle = "rgb(205,40,40)";
+context.moveTo(50, 50);
+context.lineTo(150, 150);
+context.stroke();
+</script>
