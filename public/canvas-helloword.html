@@ -1,16 +1,24 @@
 <!DOCTYPE html>
 <html>
+
+        <head>
+                <title>
+                    Hello Word
+                </title>
+                <link rel='stylesheet' href='/stylesheets/style.css' />
+        <head>
+
 <body>
-    <canvas id="canvas" width="200" height="100">
+    <canvas id="helloword" >
     </canvas>
 
     <script type="text/javascript">
 
 window.onload = function() {
-         var canvas =document.getElementById("canvas");
+         var canvas =document.getElementById("helloword");
          var context2D =canvas.getContext("2d");
          context2D.font ="30px Times New Roman";
-         context2D.fillText("HelloCanvas!", 10, 35);
+         context2D.fillText("Hello Word!", 10, 35);
 }
     </script>
 </body>
