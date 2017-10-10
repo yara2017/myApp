@@ -1,0 +1,354 @@
+<!DOCTYPE html>  
+<html>  
+
+<head>  
+    <meta charset="UTF-8">  
+    <title>跳马问题</title>  
+</head>  
+
+<body>  
+  <table summary="我的表格" cellspacing=8 cellpadding=8 width=800 height=500 border=5 >  
+    
+            <caption style="padding:10px 10px;font-size:30px;color:#000000;">跳马问题</caption>
+    
+        <tr>  
+        <th bgcolor="#D3D3D3">棋盘行数m（m>0）</th>  
+        <th bgcolor="#D3D3D3">棋盘列数n（n>0) </th>  
+        <th bgcolor="#D3D3D3">“马”初始位置x坐标（0<=x<=m）</th> 
+        <th bgcolor="#D3D3D3">“马”初始位置y坐标（0<=y<=n）</th>   
+        </tr>  
+    
+    <!--输入框，仅允许输入数字，且相互之间限制线-->
+        <tr> 
+            <td><div><input type="number" min="0"  style="text-align:center;font-size:25px" id="m"></div></td>
+            <td><div><input type="number" min="0"  style="text-align:center;font-size:25px" id="n"></div></td>
+            <td><div><input type="number" min="0"  style="text-align:center;font-size:25px" id="x"></div></td>
+            <td><div><input type="number" min="0"  style="text-align:center;font-size:25px" id="y"></div></td>
+        </tr>  
+    
+        <tr>  
+            <td rowspan="2"><input id="start" type="button" value=计算结果： style="width:100%;height:100%;font-size:30px" onclick="operate('计算结果：')"></td>  
+            <th rowspan="2" colspan="3">
+              <a href="javascript:location.reload();"><br>重置刷新</a>
+              <div style="width: 100%; height: 100%;font-size:20px" id="output" onclick="operate('计算结果：')"></div>
+            </th>
+        </tr> 
+    </table>  
+
+    <script>  
+      var m;
+      var n;           //定义棋盘的大小：m行，n列
+      var num=0;
+      var variety=0;  //记录周游路径数量
+      var bond;       //边界
+
+      // var x0;
+      // var y0;
+      // x0=parseInt(document.getElementById("x").value);
+      // y0=parseInt(document.getElementById("y").value);
+
+      var trail = new Array(50000); //记录棋子轨迹
+      var stack = new Array(50000); //存储过程的栈
+      
+      function operate() //按键函数
+       {    
+        m=document.getElementById("m").value-1;
+        n=document.getElementById("n").value-1;
+         bond=(m+1)*(n+1)-2; 
+         start();         
+       }
+
+           function result(value)
+      {
+         this.value=value;
+      }
+
+      var result1= new result();         //检验是否为棋盘内的结果
+      var result2= new result();         //检验是否为重复点的结果
+      var result3= new result();         //变来变去的结果
+      result2.value=0;
+
+      function points(x,y) //定义xy数组
+      {
+        this.x=x;
+        this.y=y;
+      }    
+
+      var point = new points();
+      point.x=0;
+      point.y=0; //输入的棋子初始位置   
+
+      // point.x=x0;
+      // point.y=y0;
+  
+  
+      function location1 (x,y)//判断棋盘内外
+      {
+         if((x>m)||(x<0)||(y>n)||(y<0))
+         {
+           result1.value=1;//棋盘外
+         }
+         else
+         {
+           result1.value=0;//棋盘内
+         }
+      }
+  
+      function track (stack,x,y)//遍历
+      {
+          var top = 0; 
+         while(stack[top]!=null){
+          if((x==stack[0].x) && (y==stack[0].y))
+        {
+           result2.value = 2; //回到起点
+           break;
+        }
+        else if((x==stack[top].x) && (y==stack[top].y))
+        {
+          result2.value =1; //重复点
+          break;
+        }
+        top++;
+      if (stack[top]==null)
+        {
+          result2.value = 0;//可走点
+        }
+       }
+      }
+  
+      function instack(x,y)//入栈
+      {
+         var top =0;
+         while(stack[top]!=null){
+         top++;
+         }
+         stack[top]=new points();
+         stack[top].x=x;
+         stack[top].y=y;                
+      }
+  
+      function nextstep(stack,flag) //棋子的八个跳跃方向
+      {
+            switch(flag)
+            {
+                    //1：左上1
+                    case 0:
+                    location1(point.x+1,point.y+2);
+                    x=point.x+1;
+                    y=point.y+2;
+  
+                    track(stack,x,y);
+                    if(result1.value==0&&result2.value==0)
+                   {
+                      point.x=point.x+1;
+                      point.y=point.y+2;
+                   return(0);
+                   }
+                   else if(result2.value == 2)  //回到起点
+                   {
+                    point.x=point.x+1;
+                    point.y=point.y+2;
+                   result3.value=6;
+                   return(0);
+                   }
+                   break;
+      
+                  //2：左上2
+                  case 1:
+                  location1(point.x+2,point.y+1);
+                  x=point.x+2;
+                  y=point.y+1;
+  
+                  track(stack,x,y);
+                  if(result1.value==0&&result2.value==0)
+                  {
+                   point.x=point.x+2;
+                   point.y=point.y+1;
+                   return(0);
+                  }
+                  else if(result2.value == 2)  //回到起点
+                 {
+                  point.x=point.x+2;
+                  point.y=point.y+1;
+                 result3.value=6;
+                 return(0);
+                 }
+                  break;
+  
+                 //3：右上1
+                 case 2:
+                 location1(point.x+2,point.y-1);
+                 x=point.x+2;
+                 y=point.y-1;
+  
+                 track(stack,x,y);
+                 if(result1.value==0&&result2.value==0)
+                {
+                 point.x=point.x+2;
+                 point.y=point.y-1;
+                  return(0);
+                }
+                else if(result2.value == 2)  //回到起点
+                 {
+                 point.x=point.x+2;
+                 point.y=point.y-1;
+                 result3.value=6;
+               return(0);
+                }
+                 break;
+      
+               case 3:
+               //4：右上2
+               location1(point.x+1,point.y-2);
+               x=point.x+1;
+               y=point.y-2;
+  
+               track(stack,x,y);
+               if(result1.value==0&&result2.value==0)
+               {
+               point.x=point.x+1;
+               point.y=point.y-2;
+                 return(0);
+                }
+               else if(result2.value == 2)  //回到起点
+              {
+              point.x=point.x+1;
+              point.y=point.y-2;
+              result3.value=6;
+              return(0);
+                }
+               break;
+  
+  
+               //5：右下1
+               case 4:
+               location1(point.x-1,point.y-2);
+               x=point.x-1;
+                y=point.y-2;
+                 track(stack,x,y);
+               if(result1.value==0&&result2.value==0)
+              {
+                point.x=point.x-1;
+                point.y=point.y-2;
+                return(0);
+               }
+               else if(result2.value == 2)  //回到起点
+              {
+                point.x=point.x-1;
+                point.y=point.y-2;
+              result3.value=6;
+              return(0);
+              }
+               break;
+  
+               //6：右下2
+                case 5:
+              location1(point.x-2,point.y-1);
+                x=point.x-2;
+               y=point.y-1;
+                track(stack,x,y);
+                if(result1.value==0&&result2.value==0)
+               {
+                point.x=point.x-2;
+                point.y=point.y-1;
+                 return(0);
+                 }
+                 else if(result2.value == 2)  //回到起点
+                 {
+                 point.x=point.x-2;
+                 point.y=point.y-1;
+                 result3.value=6;
+                 return(0);
+                }
+                 break;
+  
+                //7：左下1
+                case 6:
+                 location1(point.x-2,point.y+1);
+                 x=point.x-2;
+                 y=point.y+1;
+                 track(stack,x,y);
+                 if(result1.value==0&&result2.value==0)
+                 {
+                  point.x=point.x-2;
+                  point.y=point.y+1;
+                  return(0);
+                 }
+                else if(result2.value == 2)  //回到起点
+                {
+                  point.x=point.x-2;
+                  point.y=point.y+1;
+                  result3.value=6;
+                  return(0);
+                }
+               break;
+  
+              //8：左下2
+              case 7:
+               location1(point.x-1,point.y+2);
+                x=point.x-1;
+               y=point.y+2;
+                track(stack,x,y);
+               if(result1.value==0&&result2.value==0)
+               {
+               point.x=point.x-1;
+               point.y=point.y+2;
+              return(0);
+              }
+              else if(result2.value == 2)  //回到起点
+             {
+              point.x=point.x-1;
+              point.y=point.y+2;
+             result3.value=6;
+             return(0);
+             }
+             break;
+         }
+      return(1);
+      } 
+      
+      function start() //主要计算函数
+      {
+          var a=0;
+          var b=0;
+          var x=point.x;
+          var y=point.y;
+  
+          num++;
+          instack(point.x,point.y);
+
+        if(result3.value==6)
+        {
+          while(stack[b]!=null)
+        {
+          if(num<=bond)
+              break;          
+           document.getElementById("output").innerHTML= document.getElementById("output").innerHTML+stack[b].x+stack[b].y+"  ";
+           b++;
+        }
+
+        if(num>bond)
+        {
+        document.getElementById("output").innerHTML=document.getElementById("output").innerHTML+"<br\>";
+        }
+        result3.value=0;
+         variety++;
+        }
+  
+        for(;a<8;a++)
+        {
+          point.x = x;
+          point.y = y;
+          if(nextstep(stack,a)==0)
+          {
+            start(); 
+            stack[num-1]=null;
+            num--;
+          }
+        }
+  
+      } 
+  
+</script>  
+</body>  
+</html>  
