@@ -1,0 +1,201 @@
+<!DOCTYPE html>  
+<html>  
+
+<head>  
+    <meta charset="UTF-8">  
+    <title>最佳工作序列</title>  
+</head>
+
+<body>
+      <table cellspacing=8 cellpadding=8 width=800 height=400 border=4 >  
+        
+                <caption style="padding:10px 10px;font-size:30px;color:#000000;">最佳工作序列</caption>
+        
+            <tr>  
+            <th bgcolor="#D3D3D3"> <input type="file" name="file" id="filePicker"/></th>
+            <th bgcolor="#D3D3D3">最佳工作序列：</th>
+            </tr>
+
+            <tr>  
+                 <td style="font-size:20px"><input type="button" value = "显示并计算"  onclick="show()"/>
+                    <div id="output"></div></td> 
+                 <td style="text-align:center;font-size:25px"><div id="m"></div></td>
+            </tr> 
+        </table> 
+
+        
+            
+        
+        
+        <div id="output"></div>
+        
+        <script>
+             var Require = new Array();//费时
+             var Limit=new Array();//最后完成期限
+             var sum=new Array();//前面n个任务的费时和
+             var valueAverage=new Array();//价值
+             var order=new Array();//最佳序列
+
+             function Search(Limit,value) 
+             {
+                 var i=-1;
+                 Limit.forEach(function(t) {
+                    i++
+                     if(t==value)
+                     {
+                         return i;
+                     }
+                 }, this);                 
+             }
+
+             function Con(order, nwork, sum, valueAverage, RequireTime, Limit)
+             {
+                if (valueAverage[order[order.Length - 2]] < valueAverage[nwork])
+                {
+                    if (sum[sum.Length - 1] < Limit[order[order.Length - 2]])
+                    {
+                    var temp = order[order.Length - 2];
+                    order[order.Length - 1] = temp;
+                    order[order.Length - 2] = nwork;
+
+                    if (sum.Length < 3)
+                    {
+                        var s = sum[sum.Length - 2];
+                        sum[sum.Length - 2] = RequireTime[nwork];
+                        sum[sum.Length - 1] = s;
+                    }
+                    else
+                    {
+                        var s = sum[sum.Length - 2] - sum[sum.Length - 3];
+                        sum[sum.Length - 2] = sum[sum.Length - 3] + RequireTime[nwork];
+                        sum[sum.Length - 1] = sum[sum.Length - 2] + s;
+                    }
+
+                    if (order.Length > 2)
+                    {
+                        var torder = new Array[order.Length - 1];
+                        var tsum = new int[sum.Length - 1];
+                        for (var j = 0; j < order.Length - 1; j++)
+                        {
+                            torder[j] = order[j];
+                            tsum[j] = sum[j];
+                        }
+
+                        Con(torder, nwork, tsum, valueAverage, RequireTime, Limit);
+
+                        for (var j = 0; j < torder.Length; j++)
+                        {
+                            order[j] = torder[j];
+                            sum[j] = tsum[j];
+                        }
+                    }
+                }
+            }
+            }
+
+            function public (Empty,Add){    
+                //public    
+                this.Empty = Empty; 
+                this.Add=Add;
+            }
+
+            function show()
+            {
+                var reader = new FileReader();
+                var re,r;
+                reader.onload = function() 
+                    {
+                        re=this.result;
+                        r=re.split("\n");
+                        var i=0;
+                        while(i<r.length){
+                                    document.getElementById("output").innerHTML=document.getElementById("output").innerHTML+r[i]+"<br />";
+                                    i++;
+                                }
+                            }
+                            var readText = document.getElementById("filePicker").files[0];
+                            reader.readAsText(readText);            
+                    
+
+            try
+            {
+                for (var i = 0; i < m; i++)
+                {
+                   var data = readText[i];
+
+                    if (i != 0)
+                    {
+                        data = data.Substring(data.IndexOf("\n") + 1, data.Length - 1 - data.IndexOf("\n"));
+                        var d;
+                        d = data.Substring(0, data.IndexOf("\n"));
+                        Require.Add(Number(d));
+                        data = data.Substring(data.IndexOf("\n") + 1, data.Length - 1 - data.IndexOf("\n"));
+                        d = data.Substring(0, data.IndexOf("\n"));
+                        Limit.Add(Number(d));
+                        d = data.Substring(data.IndexOf("\n") + 1, data.Length - 1 - data.IndexOf("\n"));
+                        var x = Convert.ToDouble(Number(d)) / Convert.ToDouble((Require[Require.Count - 1]));
+                        valueAverage.Add(x);
+                    }
+
+                }
+            }
+            catch (err)
+            {
+                document.getElementById("output").innerHTML="文件读取错误<br />";
+            }
+            }
+
+            function Main()
+        {
+            show();
+            var array;
+            array = new Number(Limit.Count);
+            var valueAver = new Number(Limit.Count);
+            var limit = new Number(Limit.Count);
+
+            for (var i = 0; i < Limit.Count; i++)
+            {
+                Limit[i] =limit[i];
+            }
+
+            for (var i = 0; i < Limit.Count; i++)
+            {
+                valueAver[i] = valueAverage[i];
+            }
+
+
+            while (order.Count < Limit.Count)
+            {
+               
+                var i = Search(limit, limit.Min());
+
+                limit[i] = 10000;
+                order.Add(i);
+
+                if (order.Count > 1)
+                {
+                    array = order.ToArray();
+                    Con(array, i, sum.ToArray(), valueAver, Require.ToArray(), Limit.ToArray());
+                    order = array.ToList();
+                }
+                else if (order.Count < 2)
+                {
+                    sum.Add(sum.Sum() + Require[i]);
+                }
+                else
+                {
+                    sum.Add(sum[sum.Count - 1] + Require[i]);
+                }
+            }
+
+    
+            order.forEach(function(i) {
+                //输出最佳工作序列
+                document.getElementById("output").innerHTML=i + 1;
+            }, this);
+            ts.ReadLine();
+        }
+
+        </script>
+</body>
+</html>
