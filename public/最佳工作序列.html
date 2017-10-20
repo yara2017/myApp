@@ -1,0 +1,160 @@
+<DOCTYPE HTML>
+<html>
+    <head>
+        <title>
+            最佳工作序列
+        </title>
+    </head>
+
+        <body>
+            <table summary="我的表格" cellspacing=8 cellpadding=8 width=1000 height=300 border=5 >  
+            <caption style="padding:10px 10px;font-size:30px;color:#000000;">最佳工作序列</caption>
+            <tr>
+                <td bgcolor="#D3D3D3" colspan="5" style="text-align:center;font-size:10px">请输入测试数据，每个数一行，换行符隔开</td>
+            </tr>    
+            <tr>
+                <th bgcolor="#D3D3D3">任务</th>	<th bgcolor="#D3D3D3">费时</th>	
+                <th bgcolor="#D3D3D3">最后完成期限</th>	<th bgcolor="#D3D3D3">价值</th>
+                <td rowspan="2"><input style="width:100%;height:100%;font-size:20px" type="submit" value="确定" onclick="main()"/></td>
+                </tr>
+                
+            <tr>
+                <td name="number" id="number" style="text-align:center;" contentEditable="true"></td>
+                <td name="time" id="time" style="text-align:center;" contentEditable="true"></td>
+                <td name="dead" id="dead" style="text-align:center;" contentEditable="true"></td>
+                <td name="profit" id="profit" style="text-align:center;" contentEditable="true"></td>
+                <tr><th bgcolor="#D3D3D3">最佳工作序列</th>
+                    <th colspan="4" id="output"></th></tr>
+        </table>
+    
+        <script>
+        function main(){
+                var number1,time1,dead1,profit1,number,time,dead,profit;
+                number1=document.getElementById("number").innerHTML;
+                time1=document.getElementById("time").innerHTML;
+                dead1=document.getElementById("dead").innerHTML;
+                profit1=document.getElementById("profit").innerHTML;
+                
+                number=number1.split("<br>"); //用切割函数将输入框的内容转化为数组
+                time=time1.split("<br>");
+                dead=dead1.split("<br>");
+                profit=profit1.split("<br>");    
+
+                //建立一个二维数组job，第二维的四个数对应number,time,dead,profit四项
+                var job=new Array();
+                for(var i=0;i<number.length;i++)
+               {
+                   job[i]=new Array();
+                   job[i]=[number[i],time[i],dead[i],profit[i]];
+               } 
+        
+                document.getElementById("output").innerHTML="";//刷新输出框            
+                var deadmax=Math.max.apply(null,dead); //得出时限数组中的最大值，即为所有工作总体的最后时限
+
+                bubbleSort(job);
+                Output(job,deadmax);
+             }
+    
+           //用冒泡排序法对价值进行排序，价值相同的时候，按照期限大小排序，期限小的在前
+            function bubbleSort(job) {
+                var len = job.length;
+
+                //价值排序，价值value是job[][3]
+                for (var i = 0; i < len; i++) {
+                    for (var j = 0; j < len - 1 - i; j++) {
+                        if (job[j][3] < job[j+1][3]) {        //相邻对比
+                           //元素交换
+                            var temp = job[j+1];        
+                            job[j+1] = job[j];
+                            job[j] = temp;
+                        }
+                    }
+                }
+
+                //价值相同，按期限排序
+                for (var i = 0; i < len-1; i++) {
+                    if(job[i][3] == job[i+1][3] && job[i+1][2] < job[i][2]){
+                        //元素交换
+                        var temp = job[i+1];        
+                        job[i+1] = job[i];
+                        job[i] = temp;
+                    }
+                }
+                return job;
+            }
+
+            //检验某字符是否在数组内
+            function in_array(search,array){
+                for(var i in array){
+                    if(array[i]==search){
+                        return true;}
+                        }
+                        return false;}
+
+            //输出函数
+            function Output(job,deadmax){
+                var result =new Array();//结果
+                var deadtime; //当前工作期限
+                var time; //当前工作时间
+                var flag = 0;
+                var len = job.length;
+                            
+                var timesum=0; //时间和
+                for(var i=0;i<len;i++){
+                    timesum+=job[i][1];
+                }
+                for(var i=0;i<timesum;i++){
+                    result[i]=-1;
+                }
+                            
+                for(var i=0;i<len;i++){
+                    deadtime=job[i][2]-1;
+                    time=job[i][1];
+                    if(result[deadtime]==-1){//当天没有工作
+                        result[deadtime]=i;
+                        time--;
+                    }
+                    for(var j=deadtime-1;j>= 0;j--){
+                        if(!time){
+                            break;
+                        }
+                        if(result[j]==-1){
+                            result[j]=i;
+                            time--;    
+                        }
+                    }
+                    if(time){
+                        document.getElementById("output").innerHTML=document.getElementById("output").innerHTML+"对于工作" + job[i][0] + "，在整体效益驱动下，将下无法完成！";
+                    }
+                }
+
+                //初步结果
+                var output=new Array();
+                for(var k=0;k<timesum;k++){
+                    if(k<deadmax){ 
+                        output[k]=job[result[k]][0];
+                    }
+                }
+
+                //将初步结果反向排序，去除重复id，存入输出数组
+                var out=new Array();
+                var q=0;
+                var outputreverse=output.reverse();
+                for(var i=0;i<output.length;i++)
+                {
+                    if(!in_array(outputreverse[i],out)){
+                        out[q]=outputreverse[i];
+                        q++;
+                    }
+                }
+                var outreverse=out.reverse();
+
+                //输出
+                for(var i=0;i<out.length;i++){
+                    document.getElementById("output").innerHTML=document.getElementById("output").innerHTML+outreverse[i]+"  ";
+                }
+           } 
+
+       </script>      
+        </body>
+        </html>
