@@ -10,7 +10,7 @@
         <div  style="position:relative">    
     <table  cellspacing=8 cellpadding=8  border=5 valign="top">
         <tr>
-            <td>图在下面！请打开github"MyApp\public\空间编码数据"文件夹中的“杜_编码.txt”作为示例文件！</td>
+            <td colspan="2">图在下面！请打开github"MyApp\public\空间编码数据"文件夹中的“杜_编码.txt”作为示例文件！</td>
         </tr>
                 <tr>
                         <td colspan="2"><input type="file" name="file" id="filePicker"/>
@@ -20,7 +20,7 @@
                     <input type="button" value = "比例变换"  onclick="bili()"/></th>
                     <th>    <input type="button" value = "(0,16)对称变换"  onclick="duichen()"/>    </th>
                 </tr>
-                <tr><td>左右平移<input type="text"   id="pyX"/>上下平移<input type="text"   id="pyY"/>
+                <tr><td>左右<input type="text"   id="pyX"/>上下<input type="text"   id="pyY"/>
                     <input type="button" value = "平移变换"  onclick="pingyi()"/></td>
                 </tr>
                 <tr>
@@ -59,12 +59,11 @@ function  drawGrid1(stepX, stepY, x,y){
         }  
         context.restore();  
     }  
-    drawGrid1(490,300,830,640);  
-   
+ 
     //画出正常的名字
     var rtext,re;
     function show()
-    {  
+    {   
         var reader = new FileReader();
         reader.onload = function() 
         {
@@ -72,14 +71,14 @@ function  drawGrid1(stepX, stepY, x,y){
             re=rtext.split(/\n/);
             var i=0;
             var l=re.length
-           
+            drawGrid1(490,300,830,640);
+
            for(var i = 0; i < l; i++){
                 var string = re[i];
                 var temp = string.split(",");
     
                 if(temp.length == 1){
                     if(string[0] == 'E'){ 
-                        context.strokeStyle = "red";
                         context.lineTo(510+(20*x), 320+(20*y));
                         context.stroke(); 
                     }
@@ -97,7 +96,6 @@ function  drawGrid1(stepX, stepY, x,y){
                 else{
                     var x = temp[0];
                     var y = temp[1];
-                    context.strokeStyle = "red";
                     context.lineTo(510+(20*x), 320+(20*y));
                 }
            }
@@ -125,13 +123,12 @@ function  drawGrid1(stepX, stepY, x,y){
     
                 if(temp.length == 1){
                     if(string[0] == 'E'){ 
-                        context.strokeStyle = "red";
                         context.lineTo((510+(20*x))*bili, (320+(20*y))*bili);
                         context.stroke(); 
                     }
                     else{
                         context.beginPath(); 
-                        context.strokeStyle = "red"; 
+                        context.strokeStyle = "black"; 
                         string = re[++i];
                         temp = string.split(",");
                         var x = temp[0];
@@ -142,11 +139,10 @@ function  drawGrid1(stepX, stepY, x,y){
                 else{
                     var x = temp[0];
                     var y = temp[1];
-                    context.strokeStyle = "red";
                     context.lineTo((510+(20*x))*bili, (320+(20*y))*bili);
                 }
            }
-           
+           show();
         }
         var f = document.getElementById("filePicker").files[0];
         reader.readAsText(f);
@@ -172,13 +168,12 @@ function  drawGrid1(stepX, stepY, x,y){
     
                 if(temp.length == 1){
                     if(string[0] == 'E'){ 
-                        context.strokeStyle = "red"; 
                         context.lineTo((510+(20*x))+(pyX*20), (320+(20*y))+(pyY*20));
                         context.stroke(); 
                     }
                     else{
                         context.beginPath(); 
-                        context.strokeStyle = "red"; 
+                        context.strokeStyle = "black"; 
                         string = re[++i];
                         temp = string.split(",");
                         var x = temp[0];
@@ -189,11 +184,10 @@ function  drawGrid1(stepX, stepY, x,y){
                 else{
                     var x = temp[0];
                     var y = temp[1];
-                    context.strokeStyle = "red";
                     context.lineTo((510+(20*x))+(pyX*20), (320+(20*y))+(pyY*20));
                 }
            }
-           
+           show();
         }
         var f = document.getElementById("filePicker").files[0];
         reader.readAsText(f);
@@ -216,13 +210,12 @@ function  drawGrid1(stepX, stepY, x,y){
     
                 if(temp.length == 1){
                     if(string[0] == 'E'){ 
-                        context.strokeStyle = "red";
                         context.lineTo((510-(20*x)), (320-(20*y)));
                         context.stroke(); 
                     }
                     else{
                         context.beginPath(); 
-                        context.strokeStyle = "red"; 
+                        context.strokeStyle = "black"; 
                         string = re[++i];
                         temp = string.split(",");
                         var x = temp[0];
@@ -233,11 +226,10 @@ function  drawGrid1(stepX, stepY, x,y){
                 else{
                     var x = temp[0];
                     var y = temp[1];
-                    context.strokeStyle = "red";
                     context.lineTo((510-(20*x)), (320-(20*y)));
                 }
            }
-           
+           show();
         }
         var f = document.getElementById("filePicker").files[0];
         reader.readAsText(f);
@@ -265,13 +257,12 @@ function  drawGrid1(stepX, stepY, x,y){
                 var temp = string.split(",");
                 if(temp.length == 1){
                     if(string[0] == 'E'){ 
-                        context.strokeStyle = "red";
                         context.lineTo((510+(20*x))*cos-(320+(20*y))*sin,(510+(20*x))*sin+(320+(20*y))*cos);
                         context.stroke(); 
                     }
                     else{
                         context.beginPath(); 
-                        context.strokeStyle = "red"; 
+                        context.strokeStyle = "black"; 
                         string = re[++i];
                         temp = string.split(",");
                         var x = temp[0];
@@ -282,11 +273,10 @@ function  drawGrid1(stepX, stepY, x,y){
                 else{
                     var x = temp[0];
                     var y = temp[1];
-                    context.strokeStyle = "red";
                     context.lineTo((510+(20*x))*cos-(320+(20*y))*sin,(510+(20*x))*sin+(320+(20*y))*cos);
                 }
            }
-           
+           show();
         }
         var f = document.getElementById("filePicker").files[0];
         reader.readAsText(f);
@@ -311,13 +301,12 @@ function  drawGrid1(stepX, stepY, x,y){
 
                 if(temp.length == 1){
                     if(string[0] == 'E'){ 
-                        context.strokeStyle = "red";
                         context.lineTo((510+(20*x)), (320+(20*y))-(20*x)*A);
                         context.stroke(); 
                     }
                     else{
                         context.beginPath(); 
-                        context.strokeStyle = "red"; 
+                        context.strokeStyle = "black"; 
                         string = re[++i];
                         temp = string.split(",");
                         var x = temp[0];
@@ -328,11 +317,10 @@ function  drawGrid1(stepX, stepY, x,y){
                 else{
                     var x = temp[0];
                     var y = temp[1];
-                    context.strokeStyle = "red";
                     context.lineTo((510+(20*x)), (320+(20*y))-(20*x)*A);
                 }
            }
-           
+           show();
         }
         var f = document.getElementById("filePicker").files[0];
         reader.readAsText(f);
@@ -357,13 +345,12 @@ function  drawGrid1(stepX, stepY, x,y){
 
                 if(temp.length == 1){
                     if(string[0] == 'E'){ 
-                        context.strokeStyle = "red";
                         context.lineTo((510+(20*x))+(A*(20*y)), 320+(20*y));
                         context.stroke(); 
                     }
                     else{
                         context.beginPath(); 
-                        context.strokeStyle = "red"; 
+                        context.strokeStyle = "black";
                         string = re[++i];
                         temp = string.split(",");
                         var x = temp[0];
@@ -374,11 +361,10 @@ function  drawGrid1(stepX, stepY, x,y){
                 else{
                     var x = temp[0];
                     var y = temp[1];
-                    context.strokeStyle = "red";
                     context.lineTo((510+(20*x))+(A*(20*y)), 320+(20*y));
                 }
            }
-           
+           show();
         }
         var f = document.getElementById("filePicker").files[0];
         reader.readAsText(f);
