@@ -11,7 +11,6 @@
     <input type="file" name="file" id="filePicker"/>
     <input type="button" value = "显示"  onclick="show()"/>
 <script>
-
 //第一步：获取canvas元素
 var canvasDom = document.getElementById("demo");
 //第二步：获取上下文
@@ -21,7 +20,6 @@ context.lineWidth = 4;
 context.strokeStyle = "blue";
 //第四步：绘制矩形，只有线。内容是空的
 context.strokeRect(150,100,1040,360);
-
 function  drawGrid(stepX, stepY, x,y){  
         context.save();  
         context.lineWidth = 2; 
@@ -46,11 +44,12 @@ function  drawGrid(stepX, stepY, x,y){
     drawGrid(490,100,830,440);
     drawGrid(830,100,1170,440);
    
+    alert("请打开github“MyApp\public\空间编码数据”文件夹中的三个“x_编码.txt”作为示例文件！");
+
     var rtext,re;
     var m=new Array();
     var x=new Array();
     var y=new Array();
-
     function show()
     {  
         var reader = new FileReader();
@@ -96,7 +95,6 @@ function  drawGrid(stepX, stepY, x,y){
         var f = document.getElementById("filePicker").files[0];
         reader.readAsText(f);
     }
-
     
 </script>
 </body>

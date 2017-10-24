@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+
+        <head>
+            <meta charset="UTF-8">
+            <title>空间几何编码</title>
+        <head>
+
+<body>
+        <div  style="position:relative">    
+    <table  cellspacing=8 cellpadding=8  border=5 valign="top">
+        <tr>
+            <td>图在下面！请打开github"MyApp\public\空间编码数据"文件夹中的“杜_编码.txt”作为示例文件！</td>
+        </tr>
+                <tr>
+                        <td colspan="2"><input type="file" name="file" id="filePicker"/>
+                            <input type="button" value = "显示"  onclick="show()"/></td>
+                </tr>
+                <tr><td>变换倍数：<input type="text" id="bili"/>
+                    <input type="button" value = "比例变换"  onclick="bili()"/></th>
+                    <th>    <input type="button" value = "(0,16)对称变换"  onclick="duichen()"/>    </th>
+                </tr>
+                <tr><td>左右平移<input type="text"   id="pyX"/>上下平移<input type="text"   id="pyY"/>
+                    <input type="button" value = "平移变换"  onclick="pingyi()"/></td>
+                </tr>
+                <tr>
+                    <td>旋转度数（顺时正，逆时负）<input type="text"   id="Angle"/>
+                        <input type="button" value = "旋转变换"  onclick="xuanzhuan()"/></td>
+                </tr>
+                <tr><th><input type="button" value = "耸肩变换"  onclick="songjian()"/></th>
+                    <th><input type="button" value = "左斜变换"  onclick="zuoxie()"/></th></tr>
+            </table>
+    <canvas id="demo" width="2000px" height="800px"></canvas>
+            </div>
+
+<script>
+
+ //第一步：获取canvas元素
+ var canvasDom = document.getElementById("demo");
+ //第二步：获取上下文
+ var context = canvasDom.getContext('2d');
+
+function  drawGrid1(stepX, stepY, x,y){  
+        context.save();  
+        context.lineWidth = 2; 
+        for(var i = stepY + 20; i <= y; i += 20){  
+            context.beginPath();  
+            context.strokeStyle = "gray"; 
+            context.moveTo(stepX + 20, i);  
+            context.lineTo(x, i);  
+            context.stroke();  
+        }  
+        for(var i = stepX + 20; i <= x; i += 20){  
+            context.beginPath();  
+            context.strokeStyle = "gray";
+            context.moveTo(i, stepY + 20);  
+            context.lineTo(i, y);  
+            context.stroke();  
+        }  
+        context.restore();  
+    }  
+    drawGrid1(490,300,830,640);  
+   
+    //画出正常的名字
+    var rtext,re;
+    function show()
+    {  
+        var reader = new FileReader();
+        reader.onload = function() 
+        {
+            rtext=this.result;
+            re=rtext.split(/\n/);
+            var i=0;
+            var l=re.length
+           
+           for(var i = 0; i < l; i++){
+                var string = re[i];
+                var temp = string.split(",");
+    
+                if(temp.length == 1){
+                    if(string[0] == 'E'){ 
+                        context.strokeStyle = "red";
+                        context.lineTo(510+(20*x), 320+(20*y));
+                        context.stroke(); 
+                    }
+                    else{
+                        context.beginPath(); 
+                        context.lineWidth = 6; 
+                        context.strokeStyle = "red"; 
+                        string = re[++i];
+                        temp = string.split(",");
+                        var x = temp[0];
+                        var y = temp[1];
+                        context.moveTo(510+(20*x), 320+(20*y));
+                    }
+                }
+                else{
+                    var x = temp[0];
+                    var y = temp[1];
+                    context.strokeStyle = "red";
+                    context.lineTo(510+(20*x), 320+(20*y));
+                }
+           }
+           
+        }
+        var f = document.getElementById("filePicker").files[0];
+        reader.readAsText(f);
+    }
+
+    function bili()
+    {   
+        context.clearRect(0,0,2000,800);
+        var reader = new FileReader();
+        reader.onload = function() 
+        {
+            rtext=this.result;
+            re=rtext.split(/\n/);
+            var i=0;
+            var l=re.length;
+            var bili=document.getElementById("bili").value;
+           
+           for(var i = 0; i < l; i++){
+                var string = re[i];
+                var temp = string.split(",");
+    
+                if(temp.length == 1){
+                    if(string[0] == 'E'){ 
+                        context.strokeStyle = "red";
+                        context.lineTo((510+(20*x))*bili, (320+(20*y))*bili);
+                        context.stroke(); 
+                    }
+                    else{
+                        context.beginPath(); 
+                        context.strokeStyle = "red"; 
+                        string = re[++i];
+                        temp = string.split(",");
+                        var x = temp[0];
+                        var y = temp[1];
+                        context.moveTo((510+(20*x))*bili, (320+(20*y))*bili);
+                    }
+                }
+                else{
+                    var x = temp[0];
+                    var y = temp[1];
+                    context.strokeStyle = "red";
+                    context.lineTo((510+(20*x))*bili, (320+(20*y))*bili);
+                }
+           }
+           
+        }
+        var f = document.getElementById("filePicker").files[0];
+        reader.readAsText(f);
+    }
+
+
+    function pingyi()
+    { 
+        context.clearRect(0,0,2000,800);
+        var reader = new FileReader();
+        reader.onload = function() 
+        {
+            rtext=this.result;
+            re=rtext.split(/\n/);
+            var i=0;
+            var l=re.length;
+            var pyX=document.getElementById("pyX").value;
+            var pyY=-(document.getElementById("pyY").value);
+           
+           for(var i = 0; i < l; i++){
+                var string = re[i];
+                var temp = string.split(",");
+    
+                if(temp.length == 1){
+                    if(string[0] == 'E'){ 
+                        context.strokeStyle = "red"; 
+                        context.lineTo((510+(20*x))+(pyX*20), (320+(20*y))+(pyY*20));
+                        context.stroke(); 
+                    }
+                    else{
+                        context.beginPath(); 
+                        context.strokeStyle = "red"; 
+                        string = re[++i];
+                        temp = string.split(",");
+                        var x = temp[0];
+                        var y = temp[1];
+                        context.moveTo((510+(20*x))+(pyX*20), (320+(20*y))+(pyY*20));
+                    }
+                }
+                else{
+                    var x = temp[0];
+                    var y = temp[1];
+                    context.strokeStyle = "red";
+                    context.lineTo((510+(20*x))+(pyX*20), (320+(20*y))+(pyY*20));
+                }
+           }
+           
+        }
+        var f = document.getElementById("filePicker").files[0];
+        reader.readAsText(f);
+    }
+
+    function duichen()
+    { 
+        context.clearRect(0,0,2000,800);
+        var reader = new FileReader();
+        reader.onload = function() 
+        {
+            rtext=this.result;
+            re=rtext.split(/\n/);
+            var i=0;
+            var l=re.length;
+           
+           for(var i = 0; i < l; i++){
+                var string = re[i];
+                var temp = string.split(",");
+    
+                if(temp.length == 1){
+                    if(string[0] == 'E'){ 
+                        context.strokeStyle = "red";
+                        context.lineTo((510-(20*x)), (320-(20*y)));
+                        context.stroke(); 
+                    }
+                    else{
+                        context.beginPath(); 
+                        context.strokeStyle = "red"; 
+                        string = re[++i];
+                        temp = string.split(",");
+                        var x = temp[0];
+                        var y = temp[1];
+                        context.moveTo((510-(20*x)), (320-(20*y)));
+                    }
+                }
+                else{
+                    var x = temp[0];
+                    var y = temp[1];
+                    context.strokeStyle = "red";
+                    context.lineTo((510-(20*x)), (320-(20*y)));
+                }
+           }
+           
+        }
+        var f = document.getElementById("filePicker").files[0];
+        reader.readAsText(f);
+    }
+
+    function xuanzhuan()
+    { 
+        context.clearRect(0,0,2000,800);
+        var reader = new FileReader();
+        reader.onload = function() 
+        {
+            rtext=this.result;
+            re=rtext.split(/\n/);
+            var i=0;
+            var l=re.length;
+            var A=document.getElementById("Angle").value;
+            var Angle=2*(Math.PI)/360*A
+
+            var cos=Math.cos(Angle);
+            var sin=Math.sin(Angle);
+            alert(sin);
+           
+           for(var i = 0; i < l; i++){
+                var string = re[i];
+                var temp = string.split(",");
+                if(temp.length == 1){
+                    if(string[0] == 'E'){ 
+                        context.strokeStyle = "red";
+                        context.lineTo((510+(20*x))*cos-(320+(20*y))*sin,(510+(20*x))*sin+(320+(20*y))*cos);
+                        context.stroke(); 
+                    }
+                    else{
+                        context.beginPath(); 
+                        context.strokeStyle = "red"; 
+                        string = re[++i];
+                        temp = string.split(",");
+                        var x = temp[0];
+                        var y = temp[1];
+                        context.moveTo((510+(20*x))*cos-(320+(20*y))*sin,(510+(20*x))*sin+(320+(20*y))*cos);
+                    }
+                }
+                else{
+                    var x = temp[0];
+                    var y = temp[1];
+                    context.strokeStyle = "red";
+                    context.lineTo((510+(20*x))*cos-(320+(20*y))*sin,(510+(20*x))*sin+(320+(20*y))*cos);
+                }
+           }
+           
+        }
+        var f = document.getElementById("filePicker").files[0];
+        reader.readAsText(f);
+    }
+
+    function songjian()
+    { 
+        context.clearRect(0,0,2000,800);
+        var reader = new FileReader();
+        reader.onload = function() 
+        {
+            rtext=this.result;
+            re=rtext.split(/\n/);
+            var i=0;
+            var l=re.length;
+            var Angle=2*(Math.PI)/360*15;
+            var A=Math.sin(Angle);
+           
+           for(var i = 0; i < l; i++){
+                var string = re[i];
+                var temp = string.split(",");
+
+                if(temp.length == 1){
+                    if(string[0] == 'E'){ 
+                        context.strokeStyle = "red";
+                        context.lineTo((510+(20*x)), (320+(20*y))-(20*x)*A);
+                        context.stroke(); 
+                    }
+                    else{
+                        context.beginPath(); 
+                        context.strokeStyle = "red"; 
+                        string = re[++i];
+                        temp = string.split(",");
+                        var x = temp[0];
+                        var y = temp[1];
+                        context.moveTo((510+(20*x)), (320+(20*y))-(20*x)*A);
+                    }
+                }
+                else{
+                    var x = temp[0];
+                    var y = temp[1];
+                    context.strokeStyle = "red";
+                    context.lineTo((510+(20*x)), (320+(20*y))-(20*x)*A);
+                }
+           }
+           
+        }
+        var f = document.getElementById("filePicker").files[0];
+        reader.readAsText(f);
+    }
+
+    function zuoxie()
+    { 
+        context.clearRect(0,0,2000,800);
+        var reader = new FileReader();
+        reader.onload = function() 
+        {
+            rtext=this.result;
+            re=rtext.split(/\n/);
+            var i=0;
+            var l=re.length;
+            var Angle=2*(Math.PI)/360*15;
+            var A=Math.tan(Angle);
+           
+           for(var i = 0; i < l; i++){
+                var string = re[i];
+                var temp = string.split(",");
+
+                if(temp.length == 1){
+                    if(string[0] == 'E'){ 
+                        context.strokeStyle = "red";
+                        context.lineTo((510+(20*x))+(A*(20*y)), 320+(20*y));
+                        context.stroke(); 
+                    }
+                    else{
+                        context.beginPath(); 
+                        context.strokeStyle = "red"; 
+                        string = re[++i];
+                        temp = string.split(",");
+                        var x = temp[0];
+                        var y = temp[1];
+                        context.moveTo((510+(20*x))+(A*(20*y)), 320+(20*y));
+                    }
+                }
+                else{
+                    var x = temp[0];
+                    var y = temp[1];
+                    context.strokeStyle = "red";
+                    context.lineTo((510+(20*x))+(A*(20*y)), 320+(20*y));
+                }
+           }
+           
+        }
+        var f = document.getElementById("filePicker").files[0];
+        reader.readAsText(f);
+    }
+
+</script>
+</body>
+</html>
