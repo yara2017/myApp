@@ -1,0 +1,440 @@
+
+<html>
+
+        <head>
+            <meta charset="UTF-8">
+            <title>地图投影</title>
+        <head>
+
+<body>
+    <table cellspacing=8 cellpadding=8  border=5>
+        <tr>
+            <td><font size="5"><B>中国版图</B></font>
+                    <input style="float:right" type="button" value = "墨卡托投影"  onclick="Mercator1()"/>
+                    <br>打开北京54坐标系文件&nbsp;&nbsp;&nbsp;<input type="file" name="file" id="filePicker1"/>
+                    <input type="button" value = "显示"  onclick="show1()"/>
+                    <input type="button" value = "兰伯特投影"  onclick="Lambert()"/>
+            </td>
+            <td><font size="5"><B>世界版图</B></font>
+                    <input style="float:right" type="button" value = "北京-巴黎大圆航线(墨卡托投影)"  onclick="GreatCircleTrack()"/> 
+                    <br>打开WGS84坐标系文件&nbsp;&nbsp;&nbsp;<input type="file" name="file" id="filePicker2"/>
+                    <input type="button" value = "显示"  onclick="show2()"/>
+                    <input type="button" value = "墨卡托投影"  onclick="Mercator2()">
+            </td>
+        </tr>
+    </table>
+    <canvas id="demo" width="1200px" height="800px"></canvas>
+   
+<script>
+//第一步：获取canvas元素
+var canvasDom = document.getElementById("demo");
+//第二步：获取上下文
+var context = canvasDom.getContext('2d');
+//第三步：指定绘制线样式、颜色
+
+
+function  drawGrid(stepX, stepY, x,y,r){  
+        context.save();  
+        context.lineWidth = 0.5; 
+        for(var i = stepY+r; i <= y; i += r){  
+            context.beginPath();  
+            context.strokeStyle = "gray"; 
+            context.moveTo(stepX, i);  
+            context.lineTo(x, i);  
+            context.stroke();  
+        }  
+        for(var i = stepX+r; i <= x; i += r){  
+            context.beginPath();  
+            context.strokeStyle = "gray";
+            context.moveTo(i, stepY);  
+            context.lineTo(i, y);  
+            context.stroke();  
+        }  
+        context.restore();  
+    }  
+
+//北京54坐标系的基本参数
+var a = 6378245;               //长半轴
+var b = 6356863.01877;         //短半轴
+var e0 = 0.006693421622966;    //第一偏心率平方
+var e1 = 0.006738525414684;    //第二偏心率平方
+
+//兰伯特投影
+var L0 = 105 * Math.PI / 180;  //原点经度
+var B0 = 0;                    //原点纬度
+var B1 = 20 * Math.PI / 180;   //第一标准纬线
+var B2 = 40 * Math.PI / 180;   //第二标准纬线
+
+//WGS84坐标系的基本参数
+var a1 = 6378137;               //长半轴
+var b1 = 6356752.3142;         //短半轴
+var e01 = 0.00669437999013;    //第一偏心率平方
+var e11 = 0.006739496742227;    //第二偏心率平方
+
+var rtext,re;
+function show1()
+{
+    context.clearRect(0,0,1200,800);
+    context.lineWidth = 4; 
+    context.strokeStyle = "blue";
+    context.strokeRect(150,10,800,595);
+    drawGrid(150,10,948,601,50);
+    var reader = new FileReader();
+    reader.onload = function() 
+    {
+        rtext=this.result;
+        re=rtext.split(/\n/);
+        var i=0;
+        var l=re.length
+
+       for(var i = 0; i < l; i++){
+            var string = re[i];
+            var temp = string.split(",");
+
+            if(temp.length == 1){
+                if(string[0] == 'E'){ 
+                    context.lineTo(10*x-500, 600-10*y);
+                    context.stroke(); 
+                }
+                else{
+                    context.beginPath(); 
+                    context.strokeStyle = "black"; 
+                    context.lineWidth = 1;
+                    string = re[++i];
+                    temp = string.split(",");
+                    var x = temp[0];
+                    var y = temp[1];
+                    context.moveTo(10*x-500, 600-10*y);
+                }
+            }
+            else{
+                var x = temp[0];
+                var y = temp[1];
+                context.lineTo(10*x-500, 600-10*y);
+            }
+       }
+       
+    }
+    var f = document.getElementById("filePicker1").files[0];
+    reader.readAsText(f);
+}
+
+function show2()
+{
+    context.clearRect(0,0,1200,800);
+    context.lineWidth = 4; 
+    context.strokeStyle = "blue";
+    context.strokeRect(30,20,1090,550);
+    drawGrid(30,20,1120,575,15);
+
+    var reader = new FileReader();
+    reader.onload = function() 
+    {
+        rtext=this.result;
+        re=rtext.split(/\n/);
+        var i=0;
+        var l=re.length
+
+       for(var i = 0; i < l; i++){
+            var string = re[i];
+            var temp = string.split(",");
+
+            if(temp.length == 1){
+                if(string[0] == 'E'){ 
+                    context.lineTo(3*x+575, 300-3*y);
+                    context.stroke(); 
+                }
+                else{
+                    context.beginPath(); 
+                    context.strokeStyle = "black"; 
+                    context.lineWidth = 1;
+                    string = re[++i];
+                    temp = string.split(",");
+                    var x = temp[0];
+                    var y = temp[1];
+                    context.moveTo(3*x+575, 300-3*y);
+                }
+            }
+            else{
+                var x = temp[0];
+                var y = temp[1];
+                context.lineTo(3*x+575, 300-3*y);
+            }
+       }
+       
+    }
+    var f = document.getElementById("filePicker2").files[0];
+    reader.readAsText(f);
+}
+
+function Mercator1()
+{
+    context.clearRect(0,0,1200,800);
+    context.lineWidth = 4; 
+    context.strokeStyle = "blue";
+    context.strokeRect(150,10,800,800);
+    var reader = new FileReader();
+    reader.onload = function() 
+    {
+        rtext=this.result;
+        re=rtext.split(/\n/);
+        var i=0;
+        var l=re.length
+
+       for(var i = 0; i < l; i++){
+            var string = re[i];
+            var temp = string.split(",");
+
+            if(temp.length == 1){
+                if(string[0] == 'E'){ 
+                    context.lineTo(y1,x1);
+                    context.stroke(); 
+                }
+                else{
+                    context.beginPath(); 
+                    context.strokeStyle = "black"; 
+                    context.lineWidth = 1;
+                    string = re[++i];
+                    temp = string.split(",");
+                    var x = temp[0];
+                    var y = temp[1];
+                    var x1=750-((((Math.pow(a, 2) / b) / Math.sqrt(1 + e1)) * Math.log((Math.tan(Math.PI / 4 + (y * Math.PI / 180) / 2)) * Math.pow(((1 - Math.sqrt(e0) * Math.sin(y * Math.PI / 180)) / (1 + Math.sqrt(e0) * Math.sin(y * Math.PI / 180))), (Math.sqrt(e0) / 2)), Math.E)))/10000;
+                    var y1=550+(((Math.pow(a, 2) / b) / Math.sqrt(1 + e1)) * ((x * Math.PI / 180) - L0))/10000;
+                    context.moveTo(y1,x1);
+                }
+            }
+            else{
+                var x = temp[0];
+                var y = temp[1];
+                var x1=750-((((Math.pow(a, 2) / b) / Math.sqrt(1 + e1)) * Math.log((Math.tan(Math.PI / 4 + (y * Math.PI / 180) / 2)) * Math.pow(((1 - Math.sqrt(e0) * Math.sin(y * Math.PI / 180)) / (1 + Math.sqrt(e0) * Math.sin(y * Math.PI / 180))), (Math.sqrt(e0) / 2)), Math.E)))/10000;
+                var y1=550+(((Math.pow(a, 2) / b) / Math.sqrt(1 + e1)) * ((x * Math.PI / 180) - L0))/10000;   
+                context.lineTo(y1,x1);
+            }
+            
+       }
+       
+    }
+    var f = document.getElementById("filePicker1").files[0];
+    reader.readAsText(f);
+}
+
+function Mercator2()
+{
+    context.clearRect(0,0,1200,800);
+    context.lineWidth = 3; 
+    context.strokeStyle = "blue";
+    context.strokeRect(160,5,810,790);
+    var reader = new FileReader();
+    reader.onload = function() 
+    {
+        rtext=this.result;
+        re=rtext.split(/\n/);
+        var i=0;
+        var l=re.length
+
+       for(var i = 0; i < l; i++){
+            var string = re[i];
+            var temp = string.split(",");
+
+            if(temp.length == 1){
+                if(string[0] == 'E'){ 
+                    context.lineTo(y1,x1);
+                    context.stroke(); 
+                }
+                else{
+                    context.beginPath(); 
+                    context.strokeStyle = "black"; 
+                    context.lineWidth = 1;
+                    string = re[++i];
+                    temp = string.split(",");
+                    var x = temp[0];
+                    var y = temp[1];
+                    var x1=380-((((Math.pow(a, 2) / b) / Math.sqrt(1 + e1)) * Math.log((Math.tan(Math.PI / 4 + (y * Math.PI / 180) / 2)) * Math.pow(((1 - Math.sqrt(e0) * Math.sin(y * Math.PI / 180)) / (1 + Math.sqrt(e0) * Math.sin(y * Math.PI / 180))), (Math.sqrt(e0) / 2)), Math.E)))/50000;
+                    var y1=800+(((Math.pow(a, 2) / b) / Math.sqrt(1 + e1)) * ((x * Math.PI / 180) - L0))/50000;
+                    context.moveTo(y1,x1);
+                }
+            }
+            else{
+                var x = temp[0];
+                var y = temp[1];
+                var x1=380-((((Math.pow(a, 2) / b) / Math.sqrt(1 + e1)) * Math.log((Math.tan(Math.PI / 4 + (y * Math.PI / 180) / 2)) * Math.pow(((1 - Math.sqrt(e0) * Math.sin(y * Math.PI / 180)) / (1 + Math.sqrt(e0) * Math.sin(y * Math.PI / 180))), (Math.sqrt(e0) / 2)), Math.E)))/50000;
+                var y1=800+(((Math.pow(a, 2) / b) / Math.sqrt(1 + e1)) * ((x * Math.PI / 180) - L0))/50000;   
+                context.lineTo(y1,x1);
+            }
+            
+       }
+       
+    }
+    var f = document.getElementById("filePicker2").files[0];
+    reader.readAsText(f);
+}
+
+function Lambert()
+{
+    context.clearRect(0,0,1200,800);
+    context.lineWidth = 4; 
+    context.strokeStyle = "blue";
+    context.strokeRect(150,10,800,595);
+    var reader = new FileReader();
+    reader.onload = function() 
+    {
+        rtext=this.result;
+        re=rtext.split(/\n/);
+        var i=0;
+        var l=re.length
+
+        var tempx = 0; var tempy = 0;
+        var mb1 = Math.cos(B1) / Math.sqrt(1 - e0 * Math.pow(Math.sin(B1), 2));
+        var mb2 = Math.cos(B2) / Math.sqrt(1 - e0 * Math.pow(Math.sin(B2), 2));
+        var tb1 = Math.tan(Math.PI / 4 - B1 / 2) / Math.pow(((1 - Math.sqrt(e0) * Math.sin(B1)) / (1 + Math.sqrt(e0) * Math.sin(B1))), (Math.sqrt(e0) / 2));
+        var tb2 = Math.tan(Math.PI / 4 - B2 / 2) / Math.pow(((1 - Math.sqrt(e0) * Math.sin(B2)) / (1 + Math.sqrt(e0) * Math.sin(B1))), (Math.sqrt(e0) / 2));
+        var n = Math.log(mb1 / mb2, Math.E) / Math.log(tb1 / tb2, Math.E);
+        var f = mb1 / (n * Math.pow(tb1, n));
+        var r, r0 = a * f;
+        var ct;
+
+       for(var i = 0; i < l; i++){
+            var string = re[i];
+            var temp = string.split(",");
+
+            if(temp.length == 1){
+                if(string[0] == 'E'){ 
+                    context.lineTo(x2, y2);
+                    context.stroke(); 
+                }
+                else{
+                    context.beginPath(); 
+                    context.strokeStyle = "black"; 
+                    context.lineWidth = 1;
+                    string = re[++i];
+                    temp = string.split(",");
+                    var x = temp[0];
+                    var y = temp[1];
+                    r = a * f * Math.pow(Math.tan(Math.PI / 4 - (y * Math.PI / 180) / 2) / Math.pow(((1 - Math.sqrt(e0) * Math.sin(y * Math.PI / 180)) / (1 + Math.sqrt(e0) * Math.sin(y * Math.PI / 180))), (Math.sqrt(e0) / 2)), n);
+                    ct = n * (x * Math.PI / 180 - L0);
+                    var x1 =r0 - r * Math.cos(ct);
+                    var y1 =r * Math.sin(ct);
+
+                    tempx = x1;
+                    tempy = y1;
+                    var x2 = 0.0001 * tempy+500;
+                    var y2 = -0.0001 * tempx+645;
+                    context.moveTo(x2,y2);
+                }
+            }
+            else{
+                var x = temp[0];
+                var y = temp[1];
+                r = a * f * Math.pow(Math.tan(Math.PI / 4 - (y * Math.PI / 180) / 2) / Math.pow(((1 - Math.sqrt(e0) * Math.sin(y * Math.PI / 180)) / (1 + Math.sqrt(e0) * Math.sin(y * Math.PI / 180))), (Math.sqrt(e0) / 2)), n);
+                ct = n * (x * Math.PI / 180 - L0);
+                var x1 =r0 - r * Math.cos(ct);
+                var y1 =r * Math.sin(ct);
+
+                tempx = x1;
+                tempy = y1;
+                var x2 = 0.0001 * tempy+500;
+                var y2 = -0.0001 * tempx+645;
+                context.lineTo(x2,y2);
+            }
+       }
+       
+    }
+    var f = document.getElementById("filePicker1").files[0];
+    reader.readAsText(f);
+}
+
+        //巴黎坐标
+var LO1 = 2.35222222 ;//经度
+var LA1 = 48.85661389 ;//纬度
+        //北京坐标
+var LO2 = 116.40966670;//经度
+var LA2 = 39.90690556;//纬度
+
+var tanLA1 = Math.tan(LA1 / 180 * Math.PI);
+var tanLA2 = Math.tan(LA2 / 180 * Math.PI);
+var sinLO1 = Math.sin(LO1 / 180 * Math.PI);
+var sinLO2 = Math.sin(LO2 / 180 * Math.PI);
+var cosLO1 = Math.cos(LO1 / 180 * Math.PI);
+var cosLO2 = Math.cos(LO2 / 180 * Math.PI);
+
+//设大圆航线上的点数为1000个
+var number = 1000;
+
+//航迹点泛型
+var routes = new Array();
+
+//计算新极点Q,角度制
+var LOQ;//新极点经度
+var LAQ;//新极点纬度
+
+function Point()
+ {
+     var x;
+     var y;
+     this.x=x;
+     this.y=y;
+ }
+
+function route()
+{
+    //经度
+    LOQ = Math.atan(-(tanLA2 * cosLO1 - tanLA1 * cosLO2) / (tanLA2 * sinLO1 - tanLA1 * sinLO2)) * 180 / Math.PI;
+    //纬度
+    LAQ = -Math.atan(Math.cos((LO1 - LOQ) / 180 * Math.PI) / tanLA1) * 180 / Math.PI;
+    var difference = LO2 - LO1;//北京与巴黎的经差
+    var dx = difference / number;//航迹点间的经差
+    var pts = new Array(); //存放航迹点
+
+    //北京到新极点的距离平方
+    var rr = Math.pow((LOQ - LO2 ), 2) + Math.pow((LAQ - LA2 ), 2);
+
+    for (var i = 0; i < number;i++ )
+    {
+        //实例化变量
+        pts[i]=new Point();
+                
+        //航迹点的经度
+        pts[i].x = LO2  - i * dx;
+        var tx = pts[i].x;
+                
+        //航迹点的纬度
+        var ty = Math.sqrt(rr - Math.pow((LOQ - tx), 2)) + LAQ;
+        pts[i].y = ty;
+
+        routes[i]=new Point();
+        routes[i]=pts[i];
+    }
+}
+
+function GreatCircleTrack()
+{
+    route();
+    var tempx = 0; var tempy = 0;
+            if (routes != null)
+            {
+                for (var j = 0; j < routes.length; j++)
+                {
+                    var x = routes[j].x;
+                    routes[j].x = ((Math.pow(a1, 2) / b1) / Math.sqrt(1 + e11)) * Math.log((Math.tan(Math.PI / 4 + (routes[j].y * Math.PI / 180) / 2)) * Math.pow(((1 - Math.sqrt(e01) * Math.sin(routes[j].y * Math.PI / 180)) / (1 + Math.sqrt(e01) * Math.sin(routes[j].y * Math.PI / 180))), (Math.sqrt(e01) / 2)), Math.E);
+                    routes[j].y = ((Math.pow(a1, 2) / b1) / Math.sqrt(1 + e11)) * ((x * Math.PI / 180) - 0);
+
+                    tempx = routes[j].x;
+                    tempy = routes[j].y;
+                    routes[j].x = 0.00002 * tempy + 568;
+                    routes[j].y = 378 - 0.00002 * tempx;
+                }
+            }
+        context.beginPath();
+        context.lineWidth = 2;
+        context.strokeStyle = "red";
+        for(j=0;j<routes.length-1;j++)
+        {
+            context.moveTo(routes[j].x,routes[j].y);
+            context.lineTo(routes[j+1].x,routes[j+1].y);  
+        }
+        context.stroke();
+}
+
+</script>
+</body>
+</html>
