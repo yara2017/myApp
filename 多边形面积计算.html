@@ -221,7 +221,6 @@ function fansuan(Y, X) {//进行墨卡托反算
     return point;
 }
 
-
 function show2() {
     context.clearRect(0, 0, 1100, 600);
     context.lineWidth = 4; 
@@ -259,8 +258,8 @@ function show2() {
                 string[N] = new Array();
             }
         }
-        sumArea2 = new Array();
-        sumArea2 = SumArea(string);
+        sumArea = new Array();
+        sumArea = SumArea(string);
         context.beginPath();
         context.strokeStyle = "black";
         context.lineWidth = 1;
@@ -307,12 +306,12 @@ function area2() {
                 string[N] = new Array();
             }
         }
-        sumArea2 = new Array();
-        sumArea2 = SumArea2(string);
+        sumArea = new Array();
+        sumArea = SumArea(string);
     document.getElementById("output").innerHTML="";
     for(var j=0;j<13;j++)
     {
-        document.getElementById("output").innerHTML=document.getElementById("output").innerHTML +"第"+(j+1)+"块地的面积为："+sumArea2[j]+"平方米<br>";
+        document.getElementById("output").innerHTML=document.getElementById("output").innerHTML +"第"+(j+1)+"块地的面积为："+sumArea[j]+"平方米<br>";
     }   
 }
 }
