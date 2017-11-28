@@ -31,7 +31,6 @@ function main()
         a[x]=string[x].split(",");
         a[x].length=8;
     }
-    alert(a);
     var b=shuzu88();
     var bb=shuzu88();
     for(var i=0;i<8;i++)
@@ -171,20 +170,23 @@ function output_c(a)
     for (var i = 0; i < 8; i++)
     {
         for (var j = 0; j < 8; j++)
-        if (a[i][j][1]==99999999&&(a[i][j][2])==99999999)
         {
-            document.getElementById("output").innerHTML=document.getElementById("output").innerHTML+"(11111)"
-            document.getElementById("output").innerHTML=document.getElementById("output").innerHTML+a[i][j][0];
-        }
+            if(i<4&&j<4)
+            {
+                document.getElementById("output").innerHTML=document.getElementById("output").innerHTML+a[i][j][0]+"&nbsp;&nbsp;";
+            }
+            else if(i>3&&i<6&&j<2)
+            {
+                document.getElementById("output").innerHTML=document.getElementById("output").innerHTML+a[i][j][0]+a[i][j][1]+"&nbsp;&nbsp;";
+            }
         else if (a[i][j][2]== 99999999)
         {
-            document.getElementById("output").innerHTML=document.getElementById("output").innerHTML+"(22222)"
-            document.getElementById("output").innerHTML=document.getElementById("output").innerHTML+a[i][j][0]+"&nbsp;&nbsp;"+a[i][j][1];
+            document.getElementById("output").innerHTML=document.getElementById("output").innerHTML+a[i][j][0]+a[i][j][1]+"&nbsp;&nbsp;";
         }
         else
         {
-            document.getElementById("output").innerHTML=document.getElementById("output").innerHTML+"(33333)"
-            document.getElementById("output").innerHTML=document.getElementById("output").innerHTML+a[i][j][0]+"&nbsp;&nbsp;"+a[i][j][1]+"&nbsp;&nbsp;"+a[i][j][2];
+            document.getElementById("output").innerHTML=document.getElementById("output").innerHTML+a[i][j][0]+a[i][j][1]+a[i][j][2]+"&nbsp;&nbsp;";
+        }
         }
         document.getElementById("output").innerHTML=document.getElementById("output").innerHTML+"<br>";
     }
