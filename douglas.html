@@ -87,7 +87,7 @@ function DrawLambert()
     var reader = new FileReader();
     reader.readAsText(inputfile);
     reader.onload = function (e) {
-        var str = reader.result.split("\r\n");;
+        var str = reader.result.split("\r\n");
         str=read(str);
         var re=Lambert(str);
     context.clearRect(0,0,1200,800);

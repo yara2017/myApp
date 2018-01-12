@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+
+        <head>
+            <meta charset="UTF-8">
+            <title>地图符号填充</title>
+        <head>
+
+<body>
+    <div><table align="left" cellspacing=8 cellpadding=8  border=5>
+        <tr><th>地图符号填充</th></tr>
+        <tr><td><input type="file" name="file" id="filepick1"/>
+            <input type="button" value = "显示"  onclick="show1()"/>
+            <input type="button" value = "线形填充"  onclick="draw1()"/>
+        </td></tr>
+        <tr>
+            <td><input type="file" name="file" id="filepick2"/>
+                <input type="button" value = "显示"  onclick="show2()"/>
+                <input type="button" value = "图案填充"  onclick="draw2()"/>
+        </tr></table>
+    <canvas id="demo" width="1200px" height="800px"></canvas></div>
+
+<script>
+//第一步：获取canvas元素
+var canvasDom = document.getElementById("demo");
+//第二步：获取上下文
+var context = canvasDom.getContext('2d');
+
+function Point(x,y)
+{
+    this.x=x;
+    this.y=y;
+}
+
+function read(str)
+{
+        var text = str;
+        var N = 0;
+        var pointx = new Array();
+        var pointy = new Array();
+        pointx[N] = new Array();
+        pointy[N] = new Array();
+        var l = text.length;
+        var judge = 0;
+        for (i = 1; i < l - 1; i++) {
+            if (text[i] != "END") {
+                if (text[i].length != 2 && text[i].length != 3 && text[i].length != 1) {
+                    var x;
+                    var y;
+                    x = text[i].split(",")[0];
+                    y = text[i].split(",")[1];
+                    pointx[N][judge] = x*2-860155+200;
+                    pointy[N][judge] = -y*2+6521250;
+                    judge++;
+                }
+            }
+            else {
+                judge = 0;
+                N = N + 1;
+                pointx[N] = new Array();
+                pointy[N] = new Array();
+            }
+        }
+        return [pointx,pointy];
+}
+
+function show1()
+{   
+    var inputfile = document.getElementById("filepick1").files[0];
+    var reader = new FileReader();
+    reader.readAsText(inputfile);
+    reader.onload=function(e)
+    {   
+        var text=reader.result.split("\r\n");
+        var string=read(text);
+        context.beginPath();
+        context.lineWidth = 0.5;
+        pointx=string[0];
+        pointy=string[1];
+        for(i=0;i<pointx.length;i++)
+        {
+            for(j=0;j<pointx[i].length-1;j++)
+            { 
+                context.moveTo(pointx[i][j],pointy[i][j]);
+                context.lineTo(pointx[i][j+1],pointy[i][j+1]);
+            }
+        }
+        context.stroke();
+    }
+}
+
+function segmentsIntr(a, b, c, d){ 
+ // 三角形abc 面积的2倍 
+ var area_abc = (a.x - c.x) * (b.y - c.y) - (a.y - c.y) * (b.x - c.x); 
+ // 三角形abd 面积的2倍 
+ var area_abd = (a.x - d.x) * (b.y - d.y) - (a.y - d.y) * (b.x - d.x); 
+ // 面积符号相同则两点在线段同侧,不相交 (对点在线段上的情况,本例当作不相交处理); 
+ if ( area_abc*area_abd>0 ) { 
+ return false; 
+ } 
+ // 三角形cda 面积的2倍 
+ var area_cda = (c.x - a.x) * (d.y - a.y) - (c.y - a.y) * (d.x - a.x); 
+ // 三角形cdb 面积的2倍 
+ // 注意: 这里有一个小优化.不需要再用公式计算面积,而是通过已知的三个面积加减得出. 
+ var area_cdb = area_cda + area_abc - area_abd ; 
+ if ( area_cda * area_cdb > 0 ) { 
+ return false; 
+ } 
+ //计算交点坐标 
+ var t = area_cda / ( area_abd- area_abc ); 
+ var dx= t*(b.x - a.x), 
+ dy= t*(b.y - a.y); 
+ var result=new Point(a.x + dx,a.y + dy);
+ return result; 
+}
+
+function draw1()
+{
+    var inputfile = document.getElementById("filepick1").files[0];
+    var reader = new FileReader();
+    reader.readAsText(inputfile);
+    reader.onload=function(e)
+    {   
+        var text=reader.result.split("\r\n");
+        var string=read(text);
+        pointx=string[0];
+        pointy=string[1];
+        for(i=0;i<pointx.length-2;i++)
+        {
+            var xmax=Math.max.apply(null,pointx[i]);
+            var ymax=Math.max.apply(null,pointy[i]);
+            var xmin=Math.min.apply(null,pointx[i]);
+            var ymin=Math.min.apply(null,pointy[i]);
+            // context.strokeRect(xmin, ymin, xmax-xmin, ymax-ymin);
+
+            for(var b=0;b<parseInt(((xmax-xmin)+(ymax-ymin))/10)+1;b++)
+            {
+                var x3=xmax+(ymax-ymin)-10*b; 
+                var y3=ymin;
+                var num=0;
+                var x=new Array();var y=new Array();
+
+                for(var j=0;j<pointx[i].length-1;j++)
+                {
+                    x1=pointx[i][j];
+                    y1=pointy[i][j];
+                    x2=pointx[i][j+1];
+                    y2=pointy[i][j+1];
+                    var a1=new Point(x1,y1);
+                    var b1=new Point(x2,y2);
+                    var c1=new Point(x3,y3);
+                    var d1=new Point(x3+y3-ymax,ymax);
+                    var result=segmentsIntr(a1, b1, c1, d1);
+                    if(result!=false)
+                    {
+                        x[num]=result.x;
+                        y[num]=result.y;
+                        num++;
+                    }
+                }
+                context.beginPath();
+                context.lineWidth = 0.1;
+                for(var a=0;a<num+1;a++)
+                {
+                    context.moveTo(x[a],y[a]);
+                    context.lineTo(x[a+1],y[a+1]);
+                    a++;
+                }
+                    context.stroke();
+            }
+        }
+    }
+}
+
+function show2()
+{   
+    
+    var inputfile = document.getElementById("filepick2").files[0];
+    var reader = new FileReader();
+    reader.readAsText(inputfile);
+    reader.onload=function(e)
+    { 
+        var text=reader.result.split("\r\n");
+        var string=read(text);
+        context.beginPath();
+        context.lineWidth = 0.5;
+        pointx=string[0];
+        pointy=string[1];
+        for(i=0;i<pointx.length;i++)
+        {
+            for(j=0;j<pointx[i].length-1;j++)
+            { 
+                context.moveTo(pointx[i][j],pointy[i][j]);
+                context.lineTo(pointx[i][j+1],pointy[i][j+1]);
+            }
+        }
+        context.stroke();
+    }
+}
+
+function draw2()
+{
+    var inputfile = document.getElementById("filepick2").files[0];
+    var reader = new FileReader();
+    reader.readAsText(inputfile);
+    reader.onload=function(e)
+    {   
+        var text=reader.result.split("\r\n");
+        var string=read(text);
+        pointx=string[0];
+        pointy=string[1];
+        for(i=0;i<pointx.length-2;i++)
+        {
+            var xmax=Math.max.apply(null,pointx[i]);
+            var ymax=Math.max.apply(null,pointy[i]);
+            var xmin=Math.min.apply(null,pointx[i]);
+            var ymin=Math.min.apply(null,pointy[i]);
+            // context.strokeRect(xmin, ymin, xmax-xmin, ymax-ymin);
+
+            for(var b=0;b<parseInt((ymax-ymin)/10)+1;b++)
+            {
+                var x3=xmin; 
+                var y3=ymin+10*b;
+                var num=0;
+                var x=new Array();var y=new Array();
+
+                for(var j=0;j<pointx[i].length-1;j++)
+                {
+                    x1=pointx[i][j];
+                    y1=pointy[i][j];
+                    x2=pointx[i][j+1];
+                    y2=pointy[i][j+1];
+                    var a1=new Point(x1,y1);
+                    var b1=new Point(x2,y2);
+                    var c1=new Point(x3,y3);
+                    var d1=new Point(xmax,y3);
+                    var result=segmentsIntr(a1,b1,c1,d1);
+                    if(result!=false)
+                    {
+                        x[num]=result.x;
+                        y[num]=result.y;
+                        num++;
+                    }
+                }
+
+                context.beginPath();
+                context.lineWidth = 0.1;
+                for(var a=0;a<num+1;a++)
+                {
+                    context.moveTo(x[a],y[a]);
+                    context.lineTo(x[a+1],y[a+1]);
+                }
+                // for(var nn=0;nn<parseInt((ymax-ymin)/10)+1;nn++){
+                //     var aa=(nn)%2;
+                //     if(aa==0){
+                //         picture1(x,y,aa);
+                //     }
+                //     else
+                //     {
+                //         picture2(x,y,aa);
+                //     }
+                //     a++;
+                // }
+                    context.stroke();
+            }
+        }
+    }
+}
+
+function picture1(x,y,n){
+   var m = parseInt((x[n+1]-x[n])/8);
+   for(var ch=0;ch<m;ch++){
+    context.fillStyle='red';
+    context.fillRect(x[n]+(8*ch),y[n]-2,1,1);
+    context.fillRect(x[n]+3+(8*ch),y[n]-2,1,1);
+    context.fillRect(x[n]+1+(8*ch),y[n]-1,2,1);
+   }                 
+}
+
+function picture2(x,y,n){
+   var m = parseInt((x[n+1]-x[n])/8);
+   for(var ch=0;ch<m;ch++){
+    context.fillStyle='blue';
+    context.fillRect(x[n]+(8*ch),y[n]-2,1,1);
+    context.fillRect(x[n]+3+(8*ch),y[n]-2,1,1);
+    context.fillRect(x[n]+1+(8*ch),y[n]-1,2,1);
+    context.fillRect(x[n]+1+(8*ch),y[n],2,1);
+   }                 
+}
+
+</script>
+</body>
+</html>
